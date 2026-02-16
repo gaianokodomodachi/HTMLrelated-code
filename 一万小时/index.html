@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>一万小时倒计时</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div>
+          <h1>一万小时</h1>
+          <p class="subtitle">把时间变成可见的进度</p>
+        </div>
+        <div class="clock" id="now">--:--</div>
+      </header>
+
+      <main class="content">
+        <section class="panel profile">
+          <h2>个人信息</h2>
+          <div class="avatar-row">
+            <div class="avatar" id="avatarPreview">无</div>
+            <div class="avatar-actions">
+              <label class="btn">
+                上传头像
+                <input type="file" id="avatarInput" accept="image/*" />
+              </label>
+              <button class="btn ghost" id="clearAvatar" type="button">清除头像</button>
+            </div>
+          </div>
+          <label class="field">
+            <span>姓名</span>
+            <input type="text" id="nameInput" placeholder="请输入姓名" />
+          </label>
+          <label class="field">
+            <span>个性签名</span>
+            <input type="text" id="signatureInput" placeholder="写下一句话" />
+          </label>
+        </section>
+
+        <section class="panel create">
+          <h2>新建倒计时</h2>
+          <form id="createForm" class="create-form">
+            <input type="text" id="timerName" placeholder="倒计时名称" required />
+            <input type="datetime-local" id="timerStart" />
+            <button class="btn" type="submit">创建一万小时</button>
+          </form>
+          <p class="hint">每个倒计时固定为 10,000 小时，可选择起始时间，默认从创建时刻开始。</p>
+        </section>
+
+        <section class="panel countdowns">
+          <div class="panel-header">
+            <h2>倒计时列表</h2>
+            <span class="pill">总时长 10,000 小时</span>
+          </div>
+          <div id="countdownList" class="countdown-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="countdownTemplate">
+      <article class="countdown-card">
+        <header>
+          <div>
+            <h3 class="cd-title"></h3>
+            <p class="cd-meta"></p>
+          </div>
+          <div class="cd-progress">
+            <div class="bar">
+              <div class="fill"></div>
+            </div>
+            <span class="percent"></span>
+          </div>
+        </header>
+        <div class="cd-actions">
+          <label class="field compact">
+            <span>名称</span>
+            <input type="text" class="name-input" />
+          </label>
+          <label class="field compact">
+            <span>起始时间</span>
+            <input type="datetime-local" class="start-input" />
+          </label>
+          <div class="action-buttons">
+            <button class="btn ghost set-name" type="button">改名</button>
+            <button class="btn ghost set-start" type="button">设为起始</button>
+            <button class="btn ghost toggle-pause" type="button">暂停</button>
+            <button class="btn danger delete-timer" type="button">删除</button>
+          </div>
+        </div>
+        <div class="cd-time">
+          <span class="remaining"></span>
+          <span class="status"></span>
+        </div>
+        <section class="comments">
+          <h4>评论与成果</h4>
+          <ul class="comment-list"></ul>
+          <form class="comment-form">
+            <input type="text" placeholder="写下你的成果或心得" required />
+            <button class="btn ghost" type="submit">发表</button>
+          </form>
+        </section>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
