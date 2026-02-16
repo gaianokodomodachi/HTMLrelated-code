@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuoVadis</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <header class="site-header">
+      <div class="wrap">
+        <div class="brand">
+          <div class="logo" id="forum-logo">QV</div>
+          <div>
+            <h1 id="forum-title">QuoVadis</h1>
+            <p id="forum-subtitle">匿名论坛 · 帖子详情</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="panel">
+        <div class="back-row">
+          <a class="ghost" href="index.html">返回主页</a>
+          <label class="field">
+            <span>主题</span>
+            <select id="theme-select">
+              <option value="neon">霓虹黑（默认）</option>
+              <option value="pure-black">纯黑</option>
+              <option value="pure-white">纯白</option>
+              <option value="black-red">黑红</option>
+            </select>
+          </label>
+        </div>
+        <div class="panel-head">
+          <h2 id="post-title">帖子详情</h2>
+          <div class="detail-meta" id="post-meta"></div>
+        </div>
+        <div id="post-intro" class="post-intro"></div>
+        <div id="post-image" class="post-image hidden"></div>
+        <div id="post-tags" class="tag-list"></div>
+        <div class="post-actions mode-hide" id="post-actions">
+          <button type="button" class="ghost" id="edit-post">编辑帖子</button>
+          <button type="button" class="ghost danger" id="delete-post">删除帖子</button>
+        </div>
+        <form id="post-edit-form" class="post-edit hidden mode-hide">
+          <label class="field">
+            <span>标题</span>
+            <input type="text" name="title" maxlength="60" required />
+          </label>
+          <label class="field">
+            <span>简介</span>
+            <textarea name="intro" rows="3" maxlength="300" required></textarea>
+          </label>
+          <label class="field">
+            <span>时间（自定义）</span>
+            <input type="text" name="time" maxlength="40" />
+          </label>
+          <label class="field">
+            <span>发布身份</span>
+            <select name="authorType">
+              <option value="user">已有用户</option>
+              <option value="anon">匿名（随机ID）</option>
+              <option value="official">官方</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>选择用户</span>
+            <select name="authorUser"></select>
+          </label>
+          <label class="field">
+            <span>分类/合集（逗号分隔）</span>
+            <input type="text" name="categories" maxlength="80" />
+          </label>
+          <label class="field">
+            <span>配图（可选替换）</span>
+            <input type="file" name="image" accept="image/*" />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="removeImage" />
+            <span>移除现有配图</span>
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary">保存</button>
+            <button type="button" class="ghost" id="cancel-post">取消</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>回复</h2>
+          <p class="mode-hide">可选择已创建用户，也可匿名回复。</p>
+        </div>
+        <form id="reply-form" class="reply-form mode-hide">
+          <textarea placeholder="写下回复内容" required></textarea>
+          <select id="reply-author-type">
+            <option value="user">已有用户</option>
+            <option value="anon" selected>匿名（随机ID）</option>
+            <option value="official">官方</option>
+          </select>
+          <select id="reply-author-user"></select>
+          <label class="field full">
+            <span>配图（可选）</span>
+            <input type="file" id="reply-image" accept="image/*" />
+          </label>
+          <button type="submit" class="primary">回复</button>
+          <div id="reply-target" class="reply-target full hidden">
+            <span>回复对象：<strong id="reply-target-name">未知</strong></span>
+            <button type="button" class="ghost" id="clear-reply-target">取消回复</button>
+          </div>
+          <div id="reply-mode" class="reply-mode full hidden">
+            <label class="chip">
+              <input type="radio" name="replyMode" value="thread" checked />
+              <span>直接回复评论</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="replyMode" value="new" />
+              <span>新发一条评论</span>
+            </label>
+          </div>
+        </form>
+        <div id="reply-list" class="reply-list"></div>
+      </section>
+    </main>
+
+    <template id="reply-item-template">
+      <div class="reply">
+        <div class="reply-author"></div>
+        <div class="reply-floor"></div>
+        <div class="reply-context"></div>
+        <div class="reply-body"></div>
+        <div class="reply-image hidden"></div>
+        <div class="reply-actions mode-hide">
+          <button type="button" class="ghost" data-action="reply">回复</button>
+          <button type="button" class="ghost" data-action="edit-reply">编辑</button>
+          <button type="button" class="ghost danger" data-action="delete-reply">删除</button>
+        </div>
+        <form class="reply-edit hidden">
+          <textarea required></textarea>
+          <div class="reply-edit-preview hidden"></div>
+          <label class="field">
+            <span>配图（可选替换）</span>
+            <input type="file" name="image" accept="image/*" />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="removeImage" />
+            <span>移除现有配图</span>
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary">保存</button>
+            <button type="button" class="ghost" data-action="cancel-reply">取消</button>
+          </div>
+        </form>
+        <div class="reply-children"></div>
+      </div>
+    </template>
+
+    <div id="image-viewer" class="image-viewer hidden">
+      <div class="image-viewer-backdrop"></div>
+      <div class="image-viewer-content">
+        <button type="button" class="ghost image-viewer-close">关闭</button>
+        <img alt="preview" />
+      </div>
+    </div>
+
+    <script src="post.js"></script>
+  </body>
+</html>

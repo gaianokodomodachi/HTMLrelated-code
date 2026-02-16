@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuoVadis</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <header class="site-header">
+      <div class="wrap">
+        <div class="brand">
+          <div class="logo" id="forum-logo">QV</div>
+          <div>
+            <h1 id="forum-title">QuoVadis</h1>
+            <p id="forum-subtitle">匿名论坛 · 创建用户、发布帖子、自由匿名回复</p>
+          </div>
+        </div>
+        <div class="header-tools">
+          <label class="field">
+            <span>模式</span>
+            <select id="mode-select">
+              <option value="admin">管理者模式</option>
+              <option value="spectator">旁观者模式</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>主题</span>
+            <select id="theme-select">
+              <option value="neon">霓虹黑（默认）</option>
+              <option value="pure-black">纯黑</option>
+              <option value="pure-white">纯白</option>
+              <option value="black-red">黑红</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="panel mode-hide">
+        <div class="panel-head">
+          <h2>创建用户</h2>
+          <p>头像可选，姓名必填，签名可选。</p>
+        </div>
+        <form id="user-form" class="form-grid">
+          <label class="field">
+            <span>头像（可选）</span>
+            <input type="file" id="user-avatar" accept="image/*" />
+          </label>
+          <label class="field">
+            <span>姓名（必填）</span>
+            <input type="text" id="user-name" maxlength="20" placeholder="例如：小林" required />
+          </label>
+          <label class="field">
+            <span>个人签名（可选）</span>
+            <input type="text" id="user-sign" maxlength="60" placeholder="一句话介绍自己" />
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary">创建用户</button>
+          </div>
+        </form>
+        <div class="user-list" id="user-list"></div>
+      </section>
+
+      <section class="panel mode-hide">
+        <div class="panel-head">
+          <h2>发表帖子</h2>
+          <p>帖子包含标题、简介、时间（自定义字符）以及配图（可选）。</p>
+        </div>
+        <form id="post-form" class="form-grid">
+          <label class="field">
+            <span>标题（必填）</span>
+            <input type="text" id="post-title" maxlength="60" required />
+          </label>
+          <label class="field">
+            <span>简介（必填）</span>
+            <textarea id="post-intro" rows="3" maxlength="300" required></textarea>
+          </label>
+          <label class="field">
+            <span>时间（自定义）</span>
+            <input type="text" id="post-time" maxlength="40" placeholder="例如：2026 年 2 月" />
+          </label>
+          <label class="field">
+            <span>发布身份</span>
+            <select id="post-author-type">
+              <option value="user">已有用户</option>
+              <option value="anon" selected>匿名（随机ID）</option>
+              <option value="official">官方</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>选择用户</span>
+            <select id="post-author-user"></select>
+          </label>
+          <label class="field">
+            <span>分类/合集（可多选）</span>
+            <input type="text" id="post-categories" maxlength="80" placeholder="用逗号分隔，例如：生活, 摄影" />
+          </label>
+          <label class="field">
+            <span>配图（可选）</span>
+            <input type="file" id="post-image" accept="image/*" />
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary">发布帖子</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel mode-hide">
+        <div class="panel-head">
+          <h2>论坛设置与导出</h2>
+          <p>未设置名字时默认显示为 “QuoVadis”。导出支持 TXT / Word / PDF / JSON。</p>
+        </div>
+        <form id="forum-form" class="form-grid">
+          <label class="field mode-hide">
+            <span>论坛名字</span>
+            <input type="text" id="forum-name" maxlength="30" placeholder="自定义论坛名字" />
+          </label>
+          <label class="field mode-hide">
+            <span>论坛简介</span>
+            <input type="text" id="forum-desc" maxlength="80" placeholder="填写论坛简介" />
+          </label>
+          <label class="field mode-hide">
+            <span>导入 JSON</span>
+            <input type="file" id="import-json" accept="application/json" />
+          </label>
+          <label class="checkbox mode-hide">
+            <input type="checkbox" id="backup-auto" />
+            <span>自动备份（变更前提示）</span>
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary mode-hide">保存论坛名字</button>
+            <button type="button" class="ghost mode-hide" id="import-json-btn">导入并覆盖</button>
+          </div>
+        </form>
+        <div class="export-actions mode-hide">
+          <button type="button" class="ghost" id="export-txt">导出 TXT</button>
+          <button type="button" class="ghost" id="export-word">导出 Word</button>
+          <button type="button" class="ghost" id="export-pdf">导出 PDF</button>
+          <button type="button" class="ghost" id="export-json">导出 JSON</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>帖子列表</h2>
+          <p>主页面仅展示标题、简介和配图，点击帖子进入详情页。</p>
+        </div>
+        <div class="filter-bar mode-hide">
+          <div class="filter-title">分类筛选（不勾选则显示全部）</div>
+          <div id="category-filters" class="filter-list"></div>
+          <button type="button" class="ghost" id="clear-filters">清空筛选</button>
+        </div>
+        <div id="post-list" class="post-list"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
