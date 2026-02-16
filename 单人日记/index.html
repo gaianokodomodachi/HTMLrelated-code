@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>单人日记</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #f7f1e8;
+      --bg-2: #e7f0ff;
+      --ink: #1b1b1b;
+      --muted: #6c6c6c;
+      --accent: #1f6feb;
+      --card: rgba(255, 255, 255, 0.9);
+      --line: rgba(0, 0, 0, 0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --radius: 16px;
+      --input-bg: #ffffff;
+      --chip-bg: rgba(31, 111, 235, 0.12);
+      --chip-text: #1f3c88;
+      --page-bg: radial-gradient(1200px 800px at 10% 0%, var(--bg-2), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 20%, var(--bg-1), transparent 55%),
+                  linear-gradient(180deg, #fff, #f6f6f6 55%, #f4f8ff);
+    }
+
+    body[data-theme="dark"] {
+      --bg-1: #0f1218;
+      --bg-2: #1b2333;
+      --ink: #f2f4f8;
+      --muted: #9aa3b2;
+      --accent: #7aa2ff;
+      --card: rgba(19, 24, 32, 0.85);
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      --input-bg: #111827;
+      --chip-bg: rgba(122, 162, 255, 0.2);
+      --chip-text: #c9d5ff;
+      --page-bg: radial-gradient(1200px 800px at 10% 0%, rgba(54, 73, 110, 0.4), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 20%, rgba(20, 26, 38, 0.6), transparent 55%),
+                  linear-gradient(180deg, #0c111a, #0f172a 60%, #0b1322);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "ZCOOL XiaoWei", serif;
+      color: var(--ink);
+      background: var(--page-bg);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .title {
+      font-family: "ZCOOL XiaoWei", serif;
+      font-size: 42px;
+      margin: 0 0 8px;
+      letter-spacing: 1px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 24px;
+      font-size: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .profile {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px dashed rgba(0,0,0,0.12);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #fafafa;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .multi-select {
+      min-height: 120px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .button.secondary {
+      background: #111;
+    }
+
+    .button.ghost {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .button.small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+
+    .theme-toggle span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .theme-btn {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .theme-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .collections {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .collection-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--input-bg);
+    }
+
+    .collection-item span {
+      font-size: 14px;
+    }
+
+    .posts {
+      display: grid;
+      gap: 16px;
+    }
+
+    .post {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    body[data-theme="dark"] .post {
+      background: rgba(17, 23, 35, 0.9);
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .post h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .post-content {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      white-space: normal;
+    }
+
+    .comments {
+      border-top: 1px dashed var(--line);
+      padding-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .comments-title {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .comment-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .comment-item {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    body[data-theme="dark"] .comment-item {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .comment-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .comment-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .comment-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    .comment-input input {
+      flex: 1;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px 0;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.6);
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .profile { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .post-head { align-items: flex-start; flex-direction: column; }
+      .comment-input { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <div class="title-row">
+          <div>
+            <h1 class="title">单人日记</h1>
+            <p class="subtitle">记录你的一天、你的心情、你的故事。</p>
+          </div>
+          <div class="theme-toggle" id="themeToggle">
+            <span>主题</span>
+            <button class="theme-btn" data-theme="light">白色</button>
+            <button class="theme-btn" data-theme="dark">黑色</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">个人信息</h2>
+          <div class="profile">
+            <div>
+              <div class="avatar" id="avatarPreview">点击上传头像</div>
+              <input id="avatarInput" type="file" accept="image/*" style="margin-top:10px" />
+            </div>
+            <div>
+              <div style="margin-bottom:12px;">
+                <label for="nameInput">姓名</label>
+                <input id="nameInput" type="text" placeholder="你的名字" />
+              </div>
+              <div>
+                <label for="sigInput">个性签名</label>
+                <input id="sigInput" type="text" placeholder="一句话介绍自己" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">创建合集</h2>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <input id="collectionNameInput" type="text" placeholder="新合集名称" />
+          <button class="button" id="addCollectionBtn">添加</button>
+        </div>
+        <div class="collections" id="collectionList"></div>
+      </div>
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="card">
+      <h2 class="section-title">发布日记</h2>
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <label for="postTitle">标题</label>
+          <input id="postTitle" type="text" placeholder="给今天起个标题" />
+        </div>
+        <div>
+          <label for="postCollection">选择合集（可选，多选）</label>
+          <select id="postCollection" class="multi-select" multiple></select>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <label for="postWeather">天气（可选）</label>
+          <select id="postWeather">
+            <option value="">不选择</option>
+            <option value="晴">晴</option>
+            <option value="雨">雨</option>
+            <option value="阴">阴</option>
+            <option value="雪">雪</option>
+          </select>
+        </div>
+        <div>
+          <label for="postMood">心情</label>
+          <input id="postMood" type="text" placeholder="开心 / 平静 / 忙碌..." />
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label for="postContent">正文</label>
+        <textarea id="postContent" placeholder="写下今天的经历或感受..."></textarea>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="button" id="publishBtn">发布</button>
+        <button class="button ghost" id="cancelEditBtn" style="display:none;">取消编辑</button>
+      </div>
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="card">
+      <h2 class="section-title">日记列表</h2>
+      <div class="row" style="margin-bottom:12px;">
+        <div>
+          <label for="filterCollection">按合集筛选</label>
+          <select id="filterCollection"></select>
+        </div>
+        <div style="display:flex; align-items:flex-end; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+          <div style="min-width:140px;">
+            <label for="exportFormat">导出格式</label>
+            <select id="exportFormat">
+              <option value="txt">TXT（阅读版）</option>
+              <option value="word">Word（.doc）</option>
+              <option value="pdf">PDF（打印保存）</option>
+              <option value="json">JSON（完整备份）</option>
+            </select>
+          </div>
+          <button class="button ghost" id="exportBtn">导出</button>
+        </div>
+      </div>
+      <div class="posts" id="postList"></div>
+    </div>
+
+    <div class="footer-note">所有内容保存在浏览器本地 LocalStorage 中。</div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "diaryApp:v1";
+
+    const state = {
+      profile: {
+        name: "",
+        signature: "",
+        avatar: ""
+      },
+      collections: [],
+      posts: [],
+      ui: {
+        theme: "light",
+        filterCollection: "all",
+        editingPostId: ""
+      }
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function normalizePost(post) {
+      const legacyCollectionId = post.collectionId || "";
+      const collectionIds = Array.isArray(post.collectionIds)
+        ? post.collectionIds.filter(Boolean)
+        : (legacyCollectionId ? [legacyCollectionId] : []);
+      return {
+        id: post.id,
+        title: post.title || "",
+        content: post.content || "",
+        weather: post.weather || "",
+        mood: post.mood || "",
+        collectionIds,
+        createdAt: post.createdAt || Date.now(),
+        updatedAt: post.updatedAt || null,
+        comments: Array.isArray(post.comments) ? post.comments : []
+      };
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data && typeof data === "object") {
+          state.profile = Object.assign(state.profile, data.profile || {});
+          state.collections = Array.isArray(data.collections) ? data.collections : [];
+          state.posts = Array.isArray(data.posts) ? data.posts.map(normalizePost) : [];
+          state.ui = Object.assign(state.ui, data.ui || {});
+          state.ui.editingPostId = "";
+        }
+      } catch (err) {
+        console.warn("Failed to parse state", err);
+      }
+    }
+
+    function saveState() {
+      const data = Object.assign({}, state, {
+        ui: Object.assign({}, state.ui, { editingPostId: "" })
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function applyTheme(theme) {
+      const next = theme === "dark" ? "dark" : "light";
+      state.ui.theme = next;
+      document.body.setAttribute("data-theme", next);
+      const buttons = document.querySelectorAll(".theme-btn");
+      buttons.forEach(btn => {
+        const isActive = btn.getAttribute("data-theme") === next;
+        btn.classList.toggle("active", isActive);
+      });
+      saveState();
+    }
+
+    function resetPostForm() {
+      document.getElementById("postTitle").value = "";
+      document.getElementById("postContent").value = "";
+      document.getElementById("postWeather").value = "";
+      document.getElementById("postMood").value = "";
+      const collectionSelect = document.getElementById("postCollection");
+      Array.from(collectionSelect.options).forEach(option => {
+        option.selected = false;
+      });
+    }
+
+    function renderProfile() {
+      const avatarPreview = document.getElementById("avatarPreview");
+      const nameInput = document.getElementById("nameInput");
+      const sigInput = document.getElementById("sigInput");
+
+      if (state.profile.avatar) {
+        avatarPreview.innerHTML = `<img src="${state.profile.avatar}" alt="avatar" />`;
+      } else {
+        avatarPreview.textContent = "点击上传头像";
+      }
+
+      nameInput.value = state.profile.name || "";
+      sigInput.value = state.profile.signature || "";
+    }
+
+    function renderCollections() {
+      const list = document.getElementById("collectionList");
+      list.innerHTML = "";
+
+      if (state.collections.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "暂无合集，快创建一个吧。";
+        list.appendChild(empty);
+      } else {
+        state.collections.forEach(col => {
+          const item = document.createElement("div");
+          item.className = "collection-item";
+          item.innerHTML = `
+            <span>${escapeHtml(col.name)}</span>
+            <button class="button ghost" data-id="${col.id}">删除</button>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      const select = document.getElementById("postCollection");
+      const currentValues = Array.from(select.selectedOptions || []).map(option => option.value);
+      select.innerHTML = "";
+      state.collections.forEach(col => {
+        const option = document.createElement("option");
+        option.value = col.id;
+        option.textContent = col.name;
+        option.selected = currentValues.includes(col.id);
+        select.appendChild(option);
+      });
+
+      renderFilter();
+    }
+
+    function renderFilter() {
+      const filterSelect = document.getElementById("filterCollection");
+      if (!filterSelect) return;
+      const currentValue = state.ui.filterCollection || "all";
+      const isValid =
+        currentValue === "all" ||
+        currentValue === "uncategorized" ||
+        state.collections.some(col => col.id === currentValue);
+      const nextValue = isValid ? currentValue : "all";
+      state.ui.filterCollection = nextValue;
+
+      filterSelect.innerHTML = "";
+      const allOption = document.createElement("option");
+      allOption.value = "all";
+      allOption.textContent = "全部";
+      filterSelect.appendChild(allOption);
+
+      const uncategorizedOption = document.createElement("option");
+      uncategorizedOption.value = "uncategorized";
+      uncategorizedOption.textContent = "未分类";
+      filterSelect.appendChild(uncategorizedOption);
+
+      state.collections.forEach(col => {
+        const option = document.createElement("option");
+        option.value = col.id;
+        option.textContent = col.name;
+        filterSelect.appendChild(option);
+      });
+
+      filterSelect.value = nextValue;
+    }
+
+    function formatDate(ts) {
+      return new Date(ts).toLocaleString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function buildExportText() {
+      const lines = [];
+      lines.push("单人日记备份");
+      lines.push(`导出时间：${formatDate(Date.now())}`);
+      lines.push("");
+      lines.push(`姓名：${state.profile.name || "未填写"}`);
+      lines.push(`个性签名：${state.profile.signature || "未填写"}`);
+      lines.push("");
+      lines.push("合集：");
+      if (state.collections.length === 0) {
+        lines.push("（无）");
+      } else {
+        state.collections.forEach((col, index) => {
+          lines.push(`${index + 1}. ${col.name}`);
+        });
+      }
+      lines.push("");
+      lines.push("日记：");
+      if (state.posts.length === 0) {
+        lines.push("（无）");
+      } else {
+        const sorted = [...state.posts].sort((a, b) => b.createdAt - a.createdAt);
+        sorted.forEach((post, index) => {
+          const colNames = (Array.isArray(post.collectionIds) ? post.collectionIds : [])
+            .map(id => state.collections.find(c => c.id === id))
+            .filter(Boolean)
+            .map(col => col.name);
+          lines.push(`\n${index + 1}. ${post.title || "无标题"}`);
+          lines.push(`时间：${formatDate(post.createdAt)}${post.updatedAt ? `（已编辑：${formatDate(post.updatedAt)}）` : ""}`);
+          lines.push(`合集：${colNames.length ? colNames.join("、") : "未分类"}`);
+          lines.push(`天气：${post.weather || "未选择"}`);
+          lines.push(`心情：${post.mood || "未填写"}`);
+          lines.push("正文：");
+          lines.push(post.content || "");
+          const comments = Array.isArray(post.comments) ? post.comments : [];
+          lines.push("评论：");
+          if (comments.length === 0) {
+            lines.push("（无）");
+          } else {
+            comments.forEach((comment, cIndex) => {
+              lines.push(`- ${cIndex + 1}. ${comment.text}（${formatDate(comment.createdAt)}）`);
+            });
+          }
+        });
+      }
+      return lines.join("\n");
+    }
+
+    function buildExportHtml() {
+      const profileName = escapeHtml(state.profile.name || "未填写");
+      const profileSig = escapeHtml(state.profile.signature || "未填写");
+      const collectionsHtml = state.collections.length
+        ? state.collections.map(col => `<li>${escapeHtml(col.name)}</li>`).join("")
+        : "<li>无</li>";
+      const postsHtml = state.posts.length
+        ? [...state.posts].sort((a, b) => b.createdAt - a.createdAt).map(post => {
+            const colNames = (Array.isArray(post.collectionIds) ? post.collectionIds : [])
+              .map(id => state.collections.find(c => c.id === id))
+              .filter(Boolean)
+              .map(col => col.name);
+            const comments = Array.isArray(post.comments) ? post.comments : [];
+            const commentsHtml = comments.length
+              ? comments.map(comment => `<li>${escapeHtml(comment.text)}（${formatDate(comment.createdAt)}）</li>`).join("")
+              : "<li>无</li>";
+            return `
+              <section style="margin-bottom:24px;">
+                <h3 style="margin:0 0 6px;">${escapeHtml(post.title || "无标题")}</h3>
+                <div style="font-size:12px;color:#666;margin-bottom:6px;">
+                  时间：${formatDate(post.createdAt)}${post.updatedAt ? `（已编辑：${formatDate(post.updatedAt)}）` : ""}
+                </div>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                  合集：${colNames.length ? escapeHtml(colNames.join("、")) : "未分类"}｜天气：${escapeHtml(post.weather || "未选择")}｜心情：${escapeHtml(post.mood || "未填写")}
+                </div>
+                <div style="white-space:pre-wrap; line-height:1.6; margin-bottom:8px;">${escapeHtml(post.content || "")}</div>
+                <div style="font-size:12px;color:#666;">评论：</div>
+                <ul style="margin:6px 0 0 18px; padding:0;">${commentsHtml}</ul>
+              </section>
+            `;
+          }).join("")
+        : "<div>无</div>";
+
+      return `
+        <!doctype html>
+        <html lang="zh-CN">
+        <head>
+          <meta charset="utf-8" />
+          <title>单人日记备份</title>
+          <style>
+            body { font-family: Arial, \"PingFang SC\", \"Microsoft Yahei\", sans-serif; padding: 24px; color: #111; }
+            h1 { margin: 0 0 8px; }
+            .muted { color: #666; font-size: 12px; }
+            hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+          </style>
+        </head>
+        <body>
+          <h1>单人日记备份</h1>
+          <div class="muted">导出时间：${formatDate(Date.now())}</div>
+          <hr />
+          <h2>个人信息</h2>
+          <div>姓名：${profileName}</div>
+          <div>个性签名：${profileSig}</div>
+          <hr />
+          <h2>合集</h2>
+          <ul>${collectionsHtml}</ul>
+          <hr />
+          <h2>日记</h2>
+          ${postsHtml}
+        </body>
+        </html>
+      `;
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderPosts() {
+      const list = document.getElementById("postList");
+      list.innerHTML = "";
+
+      const filter = state.ui.filterCollection || "all";
+      const filtered = state.posts.filter(post => {
+        const collectionIds = Array.isArray(post.collectionIds) ? post.collectionIds : [];
+        if (filter === "all") return true;
+        if (filter === "uncategorized") {
+          return (
+            collectionIds.length === 0 ||
+            collectionIds.every(id => !state.collections.some(c => c.id === id))
+          );
+        }
+        return collectionIds.includes(filter);
+      });
+
+      if (filtered.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = filter === "all" ? "还没有日记，开始记录第一篇吧。" : "该合集暂无日记。";
+        list.appendChild(empty);
+        return;
+      }
+
+      const sorted = [...filtered].sort((a, b) => b.createdAt - a.createdAt);
+      sorted.forEach(post => {
+        const colNames = (Array.isArray(post.collectionIds) ? post.collectionIds : [])
+          .map(id => state.collections.find(c => c.id === id))
+          .filter(Boolean)
+          .map(col => col.name);
+        const weatherText = post.weather ? `天气：${escapeHtml(post.weather)}` : "天气：未选择";
+        const colText = colNames.length ? colNames.map(name => escapeHtml(name)) : ["未分类"];
+        const moodText = post.mood ? `心情：${escapeHtml(post.mood)}` : "心情：未填写";
+        const dateText = formatDate(post.createdAt);
+        const updatedText = post.updatedAt ? `已编辑：${formatDate(post.updatedAt)}` : "";
+        const contentHtml = escapeHtml(post.content).replace(/\n/g, "<br>");
+        const titleHtml = escapeHtml(post.title || "无标题");
+        const comments = Array.isArray(post.comments) ? post.comments : [];
+        const commentsHtml = comments.length
+          ? comments.map(comment => `
+              <div class="comment-item">
+                <div>${escapeHtml(comment.text)}</div>
+                <div class="comment-meta">${formatDate(comment.createdAt)}</div>
+              </div>
+            `).join("")
+          : `<div class="comment-empty">暂无评论</div>`;
+
+        const el = document.createElement("div");
+        el.className = "post";
+        el.innerHTML = `
+          <div class="post-head">
+            <h3>${titleHtml}</h3>
+            <div class="post-actions">
+              <button class="button ghost small" data-action="edit" data-id="${post.id}">编辑</button>
+              <button class="button secondary small" data-action="delete" data-id="${post.id}">删除</button>
+            </div>
+          </div>
+          <div class="meta">
+            <span>${dateText}</span>
+            ${colText.map(text => `<span class="chip">${text}</span>`).join("")}
+            <span>${weatherText}</span>
+            <span>${moodText}</span>
+            ${updatedText ? `<span>${updatedText}</span>` : ""}
+          </div>
+          <div class="post-content">${contentHtml}</div>
+          <div class="comments">
+            <div class="comments-title">评论</div>
+            <div class="comment-list">${commentsHtml}</div>
+            <div class="comment-input" data-id="${post.id}">
+              <input type="text" placeholder="写下评论..." />
+              <button class="button ghost small" data-action="add-comment" data-id="${post.id}">评论</button>
+            </div>
+          </div>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    function setEditing(postId) {
+      const publishBtn = document.getElementById("publishBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      state.ui.editingPostId = postId || "";
+      if (!postId) {
+        publishBtn.textContent = "发布";
+        cancelEditBtn.style.display = "none";
+        return;
+      }
+
+      const post = state.posts.find(item => item.id === postId);
+      if (!post) return;
+
+      document.getElementById("postTitle").value = post.title || "";
+      document.getElementById("postContent").value = post.content || "";
+      document.getElementById("postWeather").value = post.weather || "";
+      document.getElementById("postMood").value = post.mood || "";
+      const collectionSelect = document.getElementById("postCollection");
+      const selectedIds = Array.isArray(post.collectionIds) ? post.collectionIds : [];
+      Array.from(collectionSelect.options).forEach(option => {
+        option.selected = selectedIds.includes(option.value);
+      });
+      publishBtn.textContent = "保存修改";
+      cancelEditBtn.style.display = "inline-flex";
+    }
+
+    function initEvents() {
+      const avatarInput = document.getElementById("avatarInput");
+      const nameInput = document.getElementById("nameInput");
+      const sigInput = document.getElementById("sigInput");
+      const addCollectionBtn = document.getElementById("addCollectionBtn");
+      const collectionNameInput = document.getElementById("collectionNameInput");
+      const collectionList = document.getElementById("collectionList");
+      const publishBtn = document.getElementById("publishBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const filterCollection = document.getElementById("filterCollection");
+      const exportFormat = document.getElementById("exportFormat");
+      const exportBtn = document.getElementById("exportBtn");
+      const postList = document.getElementById("postList");
+      const themeToggle = document.getElementById("themeToggle");
+
+      avatarInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          state.profile.avatar = reader.result;
+          saveState();
+          renderProfile();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      nameInput.addEventListener("input", (e) => {
+        state.profile.name = e.target.value.trim();
+        saveState();
+      });
+
+      sigInput.addEventListener("input", (e) => {
+        state.profile.signature = e.target.value.trim();
+        saveState();
+      });
+
+      addCollectionBtn.addEventListener("click", () => {
+        const name = collectionNameInput.value.trim();
+        if (!name) return;
+        const exists = state.collections.some(c => c.name === name);
+        if (exists) {
+          alert("已存在同名合集");
+          return;
+        }
+        state.collections.push({
+          id: `col_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+          name
+        });
+        collectionNameInput.value = "";
+        saveState();
+        renderCollections();
+        renderPosts();
+      });
+
+      collectionList.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target.tagName !== "BUTTON") return;
+        const id = target.getAttribute("data-id");
+        if (!id) return;
+        const confirmed = confirm("确定删除该合集吗？删除后日记不会删除，但会移出该合集。");
+        if (!confirmed) return;
+        state.collections = state.collections.filter(c => c.id !== id);
+        state.posts = state.posts.map(p => {
+          const collectionIds = Array.isArray(p.collectionIds) ? p.collectionIds : [];
+          const nextIds = collectionIds.filter(colId => colId !== id);
+          return Object.assign({}, p, { collectionIds: nextIds });
+        });
+        saveState();
+        renderCollections();
+        renderPosts();
+      });
+
+      filterCollection.addEventListener("change", (e) => {
+        state.ui.filterCollection = e.target.value;
+        saveState();
+        renderPosts();
+      });
+
+      exportBtn.addEventListener("click", () => {
+        const format = exportFormat ? exportFormat.value : "json";
+        const stamp = new Date().toISOString().slice(0, 10);
+
+        if (format === "txt") {
+          const content = buildExportText();
+          downloadBlob(new Blob([content], { type: "text/plain;charset=utf-8" }), `diary-backup-${stamp}.txt`);
+          return;
+        }
+
+        if (format === "word") {
+          const html = buildExportHtml();
+          downloadBlob(new Blob([html], { type: "application/msword;charset=utf-8" }), `diary-backup-${stamp}.doc`);
+          return;
+        }
+
+        if (format === "pdf") {
+          const html = buildExportHtml();
+          const win = window.open("", "_blank");
+          if (!win) {
+            alert("无法打开新窗口，请允许弹窗后再试。");
+            return;
+          }
+          win.document.write(html);
+          win.document.close();
+          win.focus();
+          setTimeout(() => {
+            win.print();
+          }, 300);
+          return;
+        }
+
+        const data = Object.assign({}, state, {
+          ui: Object.assign({}, state.ui, { editingPostId: "" })
+        });
+        downloadBlob(
+          new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }),
+          `diary-backup-${stamp}.json`
+        );
+      });
+
+      publishBtn.addEventListener("click", () => {
+        const title = document.getElementById("postTitle").value.trim();
+        const content = document.getElementById("postContent").value.trim();
+        const weather = document.getElementById("postWeather").value;
+        const mood = document.getElementById("postMood").value.trim();
+        const collectionSelect = document.getElementById("postCollection");
+        const collectionIds = Array.from(collectionSelect.selectedOptions || []).map(option => option.value);
+
+        if (!content) {
+          alert("请先填写日记正文");
+          return;
+        }
+
+        if (state.ui.editingPostId) {
+          state.posts = state.posts.map(post => {
+            if (post.id !== state.ui.editingPostId) return post;
+            return Object.assign({}, post, {
+              title,
+              content,
+              weather,
+              mood,
+              collectionIds,
+              updatedAt: Date.now()
+            });
+          });
+          setEditing("");
+        } else {
+          state.posts.push({
+            id: `post_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+            title,
+            content,
+            weather,
+            mood,
+            collectionIds,
+            createdAt: Date.now(),
+            updatedAt: null,
+            comments: []
+          });
+        }
+
+        resetPostForm();
+
+        saveState();
+        renderPosts();
+      });
+
+      cancelEditBtn.addEventListener("click", () => {
+        setEditing("");
+        resetPostForm();
+      });
+
+      postList.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const action = target.getAttribute("data-action");
+        const postId = target.getAttribute("data-id");
+        if (!action || !postId) return;
+
+        if (action === "edit") {
+          setEditing(postId);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+
+        if (action === "delete") {
+          const confirmed = confirm("确定删除这篇日记吗？");
+          if (!confirmed) return;
+          state.posts = state.posts.filter(post => post.id !== postId);
+          if (state.ui.editingPostId === postId) {
+            setEditing("");
+            resetPostForm();
+          }
+          saveState();
+          renderPosts();
+          return;
+        }
+
+        if (action === "add-comment") {
+          const wrapper = target.closest(".comment-input");
+          if (!wrapper) return;
+          const input = wrapper.querySelector("input");
+          if (!input) return;
+          const text = input.value.trim();
+          if (!text) return;
+          state.posts = state.posts.map(post => {
+            if (post.id !== postId) return post;
+            const nextComments = Array.isArray(post.comments) ? [...post.comments] : [];
+            nextComments.push({ text, createdAt: Date.now() });
+            return Object.assign({}, post, { comments: nextComments });
+          });
+          input.value = "";
+          saveState();
+          renderPosts();
+        }
+      });
+
+      themeToggle.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const theme = target.getAttribute("data-theme");
+        if (!theme) return;
+        applyTheme(theme);
+      });
+    }
+
+    loadState();
+    applyTheme(state.ui.theme);
+    renderProfile();
+    renderCollections();
+    renderPosts();
+    initEvents();
+  </script>
+</body>
+</html>
